@@ -23,6 +23,9 @@ class Invoice extends Model
         'total_amount',
         'status',
         'items',
+        'service_templates',
+        'service_packages',
+        'use_services',
         'notes',
         'paid_at',
     ];
@@ -35,6 +38,9 @@ class Invoice extends Model
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'items' => 'array',
+        'service_templates' => 'array',
+        'service_packages' => 'array',
+        'use_services' => 'boolean',
         'paid_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -126,5 +132,77 @@ class Invoice extends Model
             self::STATUS_CANCELLED => 'Cancelada',
             default => 'Desconhecido',
         };
+    }
+
+    // Service-related methods
+    public function getSelectedServiceTemplates()
+    {
+        if (!$this->service_templates) {
+            return collect();
+        }
+
+        $templateIds = collect($this->service_templates)->pluck('id');
+        return ServiceTemplate::whereIn('id', $templateIds)->get()->map(function ($template) {
+            $serviceData = collect($this->service_templates)->firstWhere('id', $template->id);
+            $template->invoice_quantity = $serviceData['quantity'] ?? 1;
+            $template->invoice_hours = $serviceData['hours'] ?? $template->estimated_hours;
+            $template->invoice_rate = $serviceData['rate'] ?? $template->base_rate_per_hour;
+            $template->invoice_total = $template->invoice_quantity * $template->invoice_hours * $template->invoice_rate;
+            return $template;
+        });
+    }
+
+    public function getSelectedServicePackages()
+    {
+        if (!$this->service_packages) {
+            return collect();
+        }
+
+        $packageIds = collect($this->service_packages)->pluck('id');
+        return ServicePackage::whereIn('id', $packageIds)->get()->map(function ($package) {
+            $packageData = collect($this->service_packages)->firstWhere('id', $package->id);
+            $package->invoice_quantity = $packageData['quantity'] ?? 1;
+            $package->invoice_price = $packageData['price'] ?? $package->discounted_price;
+            $package->invoice_total = $package->invoice_quantity * $package->invoice_price;
+            return $package;
+        });
+    }
+
+    public function calculateServiceTotal(): float
+    {
+        $templateTotal = $this->getSelectedServiceTemplates()->sum('invoice_total');
+        $packageTotal = $this->getSelectedServicePackages()->sum('invoice_total');
+        return $templateTotal + $packageTotal;
+    }
+
+    public function generateItemsFromServices(): array
+    {
+        $items = [];
+
+        // Add service templates as items
+        foreach ($this->getSelectedServiceTemplates() as $template) {
+            $items[] = [
+                'description' => $template->name . ' (' . number_format($template->invoice_hours, 1) . 'h)',
+                'quantity' => $template->invoice_quantity,
+                'unit_price' => $template->invoice_hours * $template->invoice_rate,
+                'total' => $template->invoice_total,
+                'type' => 'service_template',
+                'service_id' => $template->id,
+            ];
+        }
+
+        // Add service packages as items
+        foreach ($this->getSelectedServicePackages() as $package) {
+            $items[] = [
+                'description' => $package->name . ' (Pacote)',
+                'quantity' => $package->invoice_quantity,
+                'unit_price' => $package->invoice_price,
+                'total' => $package->invoice_total,
+                'type' => 'service_package',
+                'service_id' => $package->id,
+            ];
+        }
+
+        return $items;
     }
 }
