@@ -27,6 +27,23 @@ Route::middleware(['auth'])->group(function () {
     })->name('customers.edit');
 });
 
+// Invoice routes
+Route::middleware(['auth'])->group(function () {
+    Route::view('invoices', 'invoices.index')->name('invoices.index');
+    Route::view('invoices/create', 'invoices.create')->name('invoices.create');
+    Route::get('invoices/{invoice}', function (App\Models\Invoice $invoice) {
+        return view('invoices.show', compact('invoice'));
+    })->name('invoices.show');
+    Route::get('invoices/{invoice}/edit', function (App\Models\Invoice $invoice) {
+        return view('invoices.edit', compact('invoice'));
+    })->name('invoices.edit');
+    Route::get('invoices/{invoice}/pdf', function (App\Models\Invoice $invoice) {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.pdf', ['invoice' => $invoice]);
+        $filename = 'fatura-' . $invoice->invoice_number . '.pdf';
+        return $pdf->download($filename);
+    })->name('invoices.pdf');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

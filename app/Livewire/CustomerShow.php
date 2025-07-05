@@ -11,7 +11,7 @@ class CustomerShow extends Component
 
     public function mount(Customer $customer): void
     {
-        $this->customer = $customer;
+        $this->customer = $customer->load('invoices');
     }
 
     public function deleteCustomer(): void

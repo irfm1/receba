@@ -183,10 +183,75 @@
                     </div>
                 @endif
 
-                <div class="text-center py-4 text-zinc-500 dark:text-zinc-400">
-                    <div class="text-sm">
-                        Em breve: histórico de faturas e interações
+                <!-- Invoices Section -->
+                <div class="mt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">Faturas</h3>
+                        <a href="{{ route('invoices.create', ['customer_id' => $customer->id]) }}" 
+                           class="inline-flex items-center px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Nova Fatura
+                        </a>
                     </div>
+                    
+                    @if($customer->invoices->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($customer->invoices->take(5) as $invoice)
+                                <div class="flex items-center justify-between py-3 px-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-medium text-zinc-900 dark:text-white">{{ $invoice->invoice_number }}</span>
+                                            <span class="px-2 py-1 text-xs rounded-full
+                                                @if($invoice->status === 'draft') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                                @elseif($invoice->status === 'sent') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                                @elseif($invoice->status === 'paid') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                                @elseif($invoice->status === 'overdue') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                                                @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                                @endif">
+                                                {{ $invoice->getStatusLabel() }}
+                                            </span>
+                                        </div>
+                                        <div class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                                            {{ $invoice->issue_date->format('d/m/Y') }} • R$ {{ number_format($invoice->total_amount, 2, ',', '.') }}
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('invoices.show', $invoice) }}" 
+                                       class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            @endforeach
+                            
+                            @if($customer->invoices->count() > 5)
+                                <div class="text-center">
+                                    <a href="{{ route('invoices.index', ['customer_id' => $customer->id]) }}" 
+                                       class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
+                                        Ver todas as {{ $customer->invoices->count() }} faturas
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="text-center py-8 text-zinc-500 dark:text-zinc-400">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-zinc-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <div class="text-sm">
+                                Nenhuma fatura encontrada para este cliente
+                            </div>
+                            <a href="{{ route('invoices.create', ['customer_id' => $customer->id]) }}" 
+                               class="inline-flex items-center mt-3 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Criar primeira fatura
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
