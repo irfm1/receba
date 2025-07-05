@@ -44,6 +44,24 @@ Route::middleware(['auth'])->group(function () {
     })->name('invoices.pdf');
 });
 
+// Service Template routes
+Route::middleware(['auth'])->group(function () {
+    Route::view('service-templates', 'service-templates.index')->name('service-templates.index');
+    Route::view('service-templates/create', 'service-templates.create')->name('service-templates.create');
+    Route::get('service-templates/{serviceTemplate}/edit', function (App\Models\ServiceTemplate $serviceTemplate) {
+        return view('service-templates.edit', compact('serviceTemplate'));
+    })->name('service-templates.edit');
+});
+
+// Service Package routes
+Route::middleware(['auth'])->group(function () {
+    Route::view('service-packages', 'service-packages.index')->name('service-packages.index');
+    Route::view('service-packages/create', 'service-packages.create')->name('service-packages.create');
+    Route::get('service-packages/{servicePackage}/edit', function (App\Models\ServicePackage $servicePackage) {
+        return view('service-packages.edit', compact('servicePackage'));
+    })->name('service-packages.edit');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

@@ -17,6 +17,11 @@
                     <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate>Clientes</flux:navlist.item>
                     <flux:navlist.item icon="document-text" :href="route('invoices.index')" :current="request()->routeIs('invoices.*')" wire:navigate>Faturas</flux:navlist.item>
                 </flux:navlist.group>
+
+                <flux:navlist.group heading="Catálogo de Serviços" class="grid">
+                    <flux:navlist.item icon="clipboard-document-list" :href="route('service-templates.index')" :current="request()->routeIs('service-templates.*')" wire:navigate>Templates de Serviços</flux:navlist.item>
+                    <flux:navlist.item icon="cube" :href="route('service-packages.index')" :current="request()->routeIs('service-packages.*')" wire:navigate>Pacotes de Serviços</flux:navlist.item>
+                </flux:navlist.group>
                 
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navlist.item>

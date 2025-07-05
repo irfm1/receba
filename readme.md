@@ -169,6 +169,7 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 ### Fase 1 - MVP Local
 - [x] Gestão básica de clientes
 - [x] Geração simples de faturas
+- [x] **Catálogo de Serviços de TI** ✨
 - [ ] Armazenamento local (SQLite)
 - [ ] Interface mobile-first
 
