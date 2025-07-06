@@ -68,9 +68,9 @@ O sistema utiliza as configurações de email já presentes no `.env`:
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=mythirfm@gmail.com
-MAIL_PASSWORD=nvssgznhtbakwcym
-MAIL_FROM_ADDRESS="mythirfm@gmail.com"
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM_ADDRESS=
 MAIL_FROM_NAME="${APP_NAME}"
 MAIL_ENCRYPTION=tls
 ```
