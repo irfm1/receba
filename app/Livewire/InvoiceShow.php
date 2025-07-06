@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Invoice;
+use App\Mail\InvoiceMail;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class InvoiceShow extends Component
@@ -40,6 +42,23 @@ class InvoiceShow extends Component
     public function edit(): void
     {
         $this->redirectRoute('invoices.edit', $this->invoice);
+    }
+
+    public function sendInvoiceEmail(): void
+    {
+        try {
+            Mail::to($this->invoice->customer->email)
+                ->send(new InvoiceMail($this->invoice));
+            
+            $this->dispatch('invoice-email-sent', [
+                'message' => 'Fatura enviada com sucesso para ' . $this->invoice->customer->email
+            ]);
+            
+        } catch (\Exception $e) {
+            $this->dispatch('invoice-email-error', [
+                'message' => 'Erro ao enviar email: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function render()
