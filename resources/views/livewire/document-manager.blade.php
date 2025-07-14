@@ -11,8 +11,7 @@
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <flux:button variant="primary" wire:click="openUploadModal">
-                        <flux:icon.plus class="size-4 mr-2" />
-                        Enviar Documentos
+                        ➕ Enviar Documentos
                     </flux:button>
                 </div>
             </div>
@@ -26,8 +25,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-gray-900">Estatísticas de Armazenamento</h2>
                 <flux:badge variant="gray" size="sm">
-                    <flux:icon.cloud-arrow-up class="size-4 mr-1" />
-                    Local
+                    ☁️ Local
                 </flux:badge>
             </div>
 
@@ -35,7 +33,7 @@
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Total de Arquivos</span>
-                        <flux:icon.document class="size-5 text-gray-400" />
+                        <span class="text-2xl">📄</span>
                     </div>
                     <p class="text-2xl font-bold text-gray-900 mt-2">{{ $storageStats['total_count'] }}</p>
                 </div>
@@ -43,7 +41,7 @@
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Espaço Utilizado</span>
-                        <flux:icon.server class="size-5 text-gray-400" />
+                        <span class="text-2xl">💾</span>
                     </div>
                     <p class="text-2xl font-bold text-gray-900 mt-2">{{ $storageStats['total_size'] }}</p>
                 </div>
@@ -51,7 +49,7 @@
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Categorias</span>
-                        <flux:icon.folder class="size-5 text-gray-400" />
+                        <span class="text-2xl">📁</span>
                     </div>
                     <p class="text-2xl font-bold text-gray-900 mt-2">{{ count($storageStats['categories']) }}</p>
                 </div>
@@ -85,8 +83,7 @@
                     </flux:select>
                     
                     <flux:button variant="ghost" wire:click="clearFilters">
-                        <flux:icon.x-mark class="size-4 mr-2" />
-                        Limpar
+                        ❌ Limpar
                     </flux:button>
                 </div>
             </div>
@@ -105,7 +102,7 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0">
-                                        <flux:icon :name="$document->icon" class="size-8 text-gray-400" />
+                                        <span class="text-3xl">📄</span>
                                     </div>
                                     
                                     <div class="min-w-0 flex-1">
@@ -152,8 +149,7 @@
                                         size="sm"
                                         wire:click="downloadDocument({{ $document->id }})"
                                     >
-                                        <flux:icon.arrow-down-tray class="size-4" />
-                                        Download
+                                        ⬇️ Download
                                     </flux:button>
                                     
                                     <flux:button 
@@ -162,8 +158,7 @@
                                         wire:click="confirmDelete({{ $document->id }})"
                                         class="text-red-600 hover:text-red-800"
                                     >
-                                        <flux:icon.trash class="size-4" />
-                                        Excluir
+                                        🗑️ Excluir
                                     </flux:button>
                                 </div>
                             </div>
@@ -176,8 +171,8 @@
                 </div>
             @else
                 <div class="text-center py-12">
-                    <flux:icon.document class="size-12 text-gray-400 mx-auto mb-4" />
-                    <p class="text-gray-600">Nenhum documento encontrado</p>
+                    <span class="text-6xl text-gray-400">📄</span>
+                    <p class="text-gray-600 mt-4">Nenhum documento encontrado</p>
                     <p class="text-sm text-gray-500 mt-1">
                         Clique em "Enviar Documentos" para adicionar arquivos
                     </p>
@@ -193,7 +188,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">Enviar Documentos</h3>
                     <flux:button variant="ghost" size="sm" wire:click="closeUploadModal">
-                        <flux:icon.x-mark class="size-4" />
+                        ❌
                     </flux:button>
                 </div>
 
@@ -281,8 +276,7 @@
                             Cancelar
                         </flux:button>
                         <flux:button type="submit" variant="primary">
-                            <flux:icon.cloud-arrow-up class="size-4 mr-2" />
-                            Enviar Documentos
+                            ☁️ Enviar Documentos
                         </flux:button>
                     </div>
                 </form>
@@ -295,7 +289,7 @@
         <flux:modal name="delete-modal" :show="$showDeleteModal">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <flux:icon.trash class="size-6 text-red-500 mr-3" />
+                    <span class="text-red-500 mr-3 text-2xl">🗑️</span>
                     <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
                 </div>
                 
@@ -309,8 +303,7 @@
                         Cancelar
                     </flux:button>
                     <flux:button variant="danger" wire:click="deleteDocument">
-                        <flux:icon.trash class="size-4 mr-2" />
-                        Excluir
+                        🗑️ Excluir
                     </flux:button>
                 </div>
             </div>

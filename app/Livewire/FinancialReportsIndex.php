@@ -66,13 +66,13 @@ class FinancialReportsIndex extends Component
         
         return [
             'total_revenue' => $invoices->sum('total_amount'),
-            'paid_revenue' => $invoices->where('payment_status', 'paid')->sum('total_amount'),
-            'pending_revenue' => $invoices->where('payment_status', 'pending')->sum('total_amount'),
-            'overdue_revenue' => $invoices->where('payment_status', 'overdue')->sum('total_amount'),
+            'paid_revenue' => $invoices->where('status', 'paid')->sum('total_amount'),
+            'pending_revenue' => $invoices->where('status', 'sent')->sum('total_amount'),
+            'overdue_revenue' => $invoices->where('status', 'overdue')->sum('total_amount'),
             'total_invoices' => $invoices->count(),
-            'paid_invoices' => $invoices->where('payment_status', 'paid')->count(),
-            'pending_invoices' => $invoices->where('payment_status', 'pending')->count(),
-            'overdue_invoices' => $invoices->where('payment_status', 'overdue')->count(),
+            'paid_invoices' => $invoices->where('status', 'paid')->count(),
+            'pending_invoices' => $invoices->where('status', 'sent')->count(),
+            'overdue_invoices' => $invoices->where('status', 'overdue')->count(),
         ];
     }
     
@@ -110,11 +110,42 @@ class FinancialReportsIndex extends Component
             $query->where('customer_id', $this->selectedCustomer);
         }
         
-        return $query->selectRaw('service_type, SUM(total_amount) as total_revenue, COUNT(*) as invoice_count')
-            ->whereNotNull('service_type')
-            ->groupBy('service_type')
-            ->orderBy('total_revenue', 'desc')
-            ->get();
+        $invoices = $query->get();
+        
+        // Group invoices by service type from service_templates and service_packages JSON fields
+        $serviceRevenue = collect();
+        
+        foreach ($invoices as $invoice) {
+            $serviceType = 'Outros';
+            
+            // Check if invoice has service templates
+            if ($invoice->service_templates && is_array($invoice->service_templates)) {
+                $serviceType = 'Serviços de TI';
+            }
+            // Check if invoice has service packages
+            elseif ($invoice->service_packages && is_array($invoice->service_packages)) {
+                $serviceType = 'Pacotes de Serviços';
+            }
+            // Check if it's a regular invoice
+            elseif ($invoice->items && is_array($invoice->items)) {
+                $serviceType = 'Serviços Gerais';
+            }
+            
+            $existing = $serviceRevenue->firstWhere('service_type', $serviceType);
+            
+            if ($existing) {
+                $existing['total_revenue'] += $invoice->total_amount;
+                $existing['invoice_count'] += 1;
+            } else {
+                $serviceRevenue->push([
+                    'service_type' => $serviceType,
+                    'total_revenue' => $invoice->total_amount,
+                    'invoice_count' => 1
+                ]);
+            }
+        }
+        
+        return $serviceRevenue->sortByDesc('total_revenue');
     }
     
     public function getTechnicalReportsDataProperty()
@@ -170,18 +201,30 @@ class FinancialReportsIndex extends Component
             $invoices = $query->with('customer')->get();
             
             foreach ($invoices as $invoice) {
+                // Determine service type from JSON fields
+                $serviceType = 'Outros';
+                if ($invoice->service_templates && is_array($invoice->service_templates)) {
+                    $serviceType = 'Serviços de TI';
+                } elseif ($invoice->service_packages && is_array($invoice->service_packages)) {
+                    $serviceType = 'Pacotes de Serviços';
+                } elseif ($invoice->items && is_array($invoice->items)) {
+                    $serviceType = 'Serviços Gerais';
+                }
+                
                 fputcsv($file, [
                     $invoice->issue_date->format('d/m/Y'),
                     $invoice->customer->name,
                     $invoice->invoice_number,
                     'R$ ' . number_format($invoice->total_amount, 2, ',', '.'),
-                    match($invoice->payment_status) {
+                    match($invoice->status) {
                         'paid' => 'Pago',
-                        'pending' => 'Pendente',
+                        'sent' => 'Enviado',
                         'overdue' => 'Vencido',
+                        'draft' => 'Rascunho',
+                        'cancelled' => 'Cancelado',
                         default => 'Indefinido'
                     },
-                    $invoice->service_type ?? 'N/A',
+                    $serviceType,
                     $invoice->due_date ? $invoice->due_date->format('d/m/Y') : 'N/A'
                 ]);
             }

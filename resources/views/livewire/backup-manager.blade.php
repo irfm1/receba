@@ -10,13 +10,12 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <flux:badge variant="lime" size="sm">
-                        <flux:icon.server class="size-4" />
-                        Local
-                    </flux:badge>
-                    <flux:badge variant="blue" size="sm">
-                        SQLite
-                    </flux:badge>
+                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        📁 Local
+                    </span>
+                    <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        🗄️ SQLite
+                    </span>
                 </div>
             </div>
         </div>
@@ -26,8 +25,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-gray-900">Informações de Armazenamento</h2>
                 <flux:button variant="ghost" size="sm" wire:click="refreshStorageInfo">
-                    <flux:icon.arrow-path class="size-4" />
-                    Atualizar
+                    🔄 Atualizar
                 </flux:button>
             </div>
 
@@ -35,25 +33,25 @@
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Banco de Dados</span>
-                        <flux:icon.database class="size-5 text-gray-400" />
+                        <span class="text-2xl">🗄️</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $storageInfo['database_size'] ?? 'N/A' }}</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $this->systemInfo['database_size'] ?? 'N/A' }}</p>
                 </div>
 
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Backups</span>
-                        <flux:icon.archive-box class="size-5 text-gray-400" />
+                        <span class="text-2xl">📦</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $storageInfo['backups_count'] ?? 0 }}</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $this->systemInfo['total_backups'] ?? 0 }}</p>
                 </div>
 
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">Espaço Total</span>
-                        <flux:icon.cloud-arrow-up class="size-5 text-gray-400" />
+                        <span class="text-2xl">💾</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $storageInfo['total_size'] ?? 'N/A' }}</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $this->systemInfo['disk_usage'] ?? 'N/A' }}</p>
                 </div>
             </div>
         </div>
@@ -63,11 +61,10 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-gray-900">Ações de Backup</h2>
                 <div class="flex items-center space-x-2">
-                    @if($isProcessing)
-                        <flux:badge variant="yellow" size="sm">
-                            <flux:icon.arrow-path class="size-4 animate-spin" />
-                            Processando...
-                        </flux:badge>
+                    @if($isCreatingBackup)
+                        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                            ⏳ Processando...
+                        </span>
                     @endif
                 </div>
             </div>
@@ -76,7 +73,7 @@
                 <!-- Create Backup -->
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center mb-3">
-                        <flux:icon.shield-check class="size-5 text-green-500 mr-2" />
+                        <span class="text-green-500 mr-2 text-xl">✅</span>
                         <h3 class="font-semibold text-gray-900">Criar Backup</h3>
                     </div>
                     <p class="text-sm text-gray-600 mb-4">
@@ -86,18 +83,17 @@
                         variant="primary" 
                         size="sm" 
                         wire:click="createBackup"
-                        :disabled="$isProcessing"
+                        :disabled="$isCreatingBackup"
                         class="w-full"
                     >
-                        <flux:icon.plus class="size-4 mr-2" />
-                        Criar Backup
+                        ➕ Criar Backup
                     </flux:button>
                 </div>
 
                 <!-- Auto Backup Settings -->
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center mb-3">
-                        <flux:icon.clock class="size-5 text-blue-500 mr-2" />
+                        <span class="text-blue-500 mr-2 text-xl">⏰</span>
                         <h3 class="font-semibold text-gray-900">Backup Automático</h3>
                     </div>
                     <p class="text-sm text-gray-600 mb-4">
@@ -105,7 +101,7 @@
                     </p>
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-700">Ativado</span>
-                        <flux:toggle 
+                        <flux:checkbox 
                             wire:model.live="autoBackupEnabled"
                             size="sm"
                         />
@@ -119,8 +115,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-gray-900">Histórico de Backups</h2>
                 <flux:button variant="ghost" size="sm" wire:click="refreshBackupList">
-                    <flux:icon.arrow-path class="size-4" />
-                    Atualizar
+                    🔄 Atualizar
                 </flux:button>
             </div>
 
@@ -130,7 +125,7 @@
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <flux:icon.archive-box class="size-5 text-gray-400" />
+                                    <span class="text-gray-400 text-xl">📦</span>
                                     <div>
                                         <h4 class="font-medium text-gray-900">{{ $backup['name'] }}</h4>
                                         <p class="text-sm text-gray-600">
@@ -145,8 +140,7 @@
                                         size="sm"
                                         wire:click="downloadBackup('{{ $backup['filename'] }}')"
                                     >
-                                        <flux:icon.arrow-down-tray class="size-4" />
-                                        Download
+                                        ⬇️ Download
                                     </flux:button>
                                     
                                     <flux:button 
@@ -154,8 +148,7 @@
                                         size="sm"
                                         wire:click="confirmRestore('{{ $backup['filename'] }}')"
                                     >
-                                        <flux:icon.arrow-uturn-left class="size-4" />
-                                        Restaurar
+                                        ↩️ Restaurar
                                     </flux:button>
                                     
                                     <flux:button 
@@ -164,8 +157,7 @@
                                         wire:click="confirmDelete('{{ $backup['filename'] }}')"
                                         class="text-red-600 hover:text-red-800"
                                     >
-                                        <flux:icon.trash class="size-4" />
-                                        Excluir
+                                        🗑️ Excluir
                                     </flux:button>
                                 </div>
                             </div>
@@ -174,8 +166,8 @@
                 </div>
             @else
                 <div class="text-center py-8">
-                    <flux:icon.archive-box class="size-12 text-gray-400 mx-auto mb-4" />
-                    <p class="text-gray-600">Nenhum backup encontrado</p>
+                    <span class="text-6xl text-gray-400">📦</span>
+                    <p class="text-gray-600 mt-4">Nenhum backup encontrado</p>
                     <p class="text-sm text-gray-500 mt-1">
                         Clique em "Criar Backup" para fazer seu primeiro backup
                     </p>
@@ -186,13 +178,13 @@
         <!-- Restore Section -->
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center mb-4">
-                <flux:icon.arrow-uturn-left class="size-5 text-orange-500 mr-2" />
+                <span class="text-orange-500 mr-2 text-xl">↩️</span>
                 <h2 class="text-lg font-semibold text-gray-900">Restaurar Backup</h2>
             </div>
 
             <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                 <div class="flex items-center">
-                    <flux:icon.exclamation-triangle class="size-5 text-orange-500 mr-2" />
+                    <span class="text-orange-500 mr-2 text-xl">⚠️</span>
                     <p class="text-sm text-orange-800">
                         <strong>Atenção:</strong> A restauração irá substituir todos os dados atuais pelos dados do backup selecionado.
                     </p>
@@ -218,10 +210,9 @@
                     variant="ghost" 
                     size="sm"
                     wire:click="restoreFromFile"
-                    :disabled="!$backupFile || $isProcessing"
+                    :disabled="!$backupFile || $isCreatingBackup"
                 >
-                    <flux:icon.arrow-uturn-left class="size-4 mr-2" />
-                    Restaurar do Arquivo
+                    ↩️ Restaurar do Arquivo
                 </flux:button>
             </div>
         </div>
@@ -232,7 +223,7 @@
         <flux:modal name="restore-confirmation" :show="$showRestoreModal">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <flux:icon.exclamation-triangle class="size-6 text-orange-500 mr-3" />
+                    <span class="text-orange-500 mr-3 text-2xl">⚠️</span>
                     <h3 class="text-lg font-semibold text-gray-900">Confirmar Restauração</h3>
                 </div>
                 
@@ -246,8 +237,7 @@
                         Cancelar
                     </flux:button>
                     <flux:button variant="danger" wire:click="restoreBackup">
-                        <flux:icon.arrow-uturn-left class="size-4 mr-2" />
-                        Restaurar
+                        ↩️ Restaurar
                     </flux:button>
                 </div>
             </div>
@@ -258,7 +248,7 @@
         <flux:modal name="delete-confirmation" :show="$showDeleteModal">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <flux:icon.trash class="size-6 text-red-500 mr-3" />
+                    <span class="text-red-500 mr-3 text-2xl">🗑️</span>
                     <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
                 </div>
                 
@@ -272,8 +262,7 @@
                         Cancelar
                     </flux:button>
                     <flux:button variant="danger" wire:click="deleteBackup">
-                        <flux:icon.trash class="size-4 mr-2" />
-                        Excluir
+                        🗑️ Excluir
                     </flux:button>
                 </div>
             </div>

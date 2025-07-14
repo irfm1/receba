@@ -25,17 +25,17 @@
             <div>
                 <flux:select wire:model.live="city" label="Município">
                     @foreach($cities as $code => $name)
-                        <flux:option value="{{ $code }}">{{ $name }}</flux:option>
+                        <option value="{{ $code }}">{{ $name }}</option>
                     @endforeach
                 </flux:select>
             </div>
             
             <div>
                 <flux:select wire:model.live="regime" label="Regime Tributário">
-                    <flux:option value="pessoa_fisica">Pessoa Física</flux:option>
-                    <flux:option value="simples">Simples Nacional</flux:option>
-                    <flux:option value="presumido">Lucro Presumido</flux:option>
-                    <flux:option value="real">Lucro Real</flux:option>
+                    <option value="pessoa_fisica">Pessoa Física</option>
+                    <option value="simples">Simples Nacional</option>
+                    <option value="presumido">Lucro Presumido</option>
+                    <option value="real">Lucro Real</option>
                 </flux:select>
             </div>
             
@@ -52,8 +52,8 @@
                 
                 <div>
                     <flux:select wire:model.live="annex" label="Anexo Simples Nacional">
-                        <flux:option value="III">Anexo III - Desenvolvimento</flux:option>
-                        <flux:option value="V">Anexo V - Consultoria</flux:option>
+                        <option value="III">Anexo III - Desenvolvimento</option>
+                        <option value="V">Anexo V - Consultoria</option>
                     </flux:select>
                 </div>
             @endif

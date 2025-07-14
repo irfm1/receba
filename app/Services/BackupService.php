@@ -360,4 +360,28 @@ class BackupService
             }
         }
     }
+    
+    public function restoreFromFile($uploadedFile): array
+    {
+        try {
+            // Save the uploaded file temporarily
+            $tempPath = $uploadedFile->store('temp');
+            
+            // Restore from the temporary file
+            $result = $this->restoreBackup(basename($tempPath));
+            
+            // Clean up temporary file
+            Storage::disk('local')->delete($tempPath);
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            Log::error('Erro ao restaurar backup do arquivo: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }

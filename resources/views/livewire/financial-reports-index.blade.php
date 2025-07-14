@@ -7,8 +7,8 @@
         </div>
         
         <div class="flex flex-col sm:flex-row gap-3">
-            <flux:button wire:click="exportToCsv" variant="outline" icon="document-arrow-down" size="sm">
-                Exportar CSV
+            <flux:button wire:click="exportToCsv" variant="outline" size="sm">
+                📊 Exportar CSV
             </flux:button>
         </div>
     </div>
@@ -18,11 +18,11 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <flux:select wire:model.live="selectedPeriod" label="Período" placeholder="Selecione o período">
-                    <flux:option value="current_month">Mês Atual</flux:option>
-                    <flux:option value="last_month">Mês Passado</flux:option>
-                    <flux:option value="current_year">Ano Atual</flux:option>
-                    <flux:option value="last_year">Ano Passado</flux:option>
-                    <flux:option value="custom">Personalizado</flux:option>
+                    <option value="current_month">Mês Atual</option>
+                    <option value="last_month">Mês Passado</option>
+                    <option value="current_year">Ano Atual</option>
+                    <option value="last_year">Ano Passado</option>
+                    <option value="custom">Personalizado</option>
                 </flux:select>
             </div>
             
@@ -37,9 +37,9 @@
             
             <div>
                 <flux:select wire:model.live="selectedCustomer" label="Cliente" placeholder="Todos os clientes">
-                    <flux:option value="">Todos os clientes</flux:option>
+                    <option value="">Todos os clientes</option>
                     @foreach($customers as $customer)
-                        <flux:option value="{{ $customer->id }}">{{ $customer->name }}</flux:option>
+                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                     @endforeach
                 </flux:select>
             </div>

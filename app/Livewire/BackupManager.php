@@ -18,7 +18,11 @@ class BackupManager extends Component
     public $isCreatingBackup = false;
     public $uploadedBackup;
     public $showRestoreModal = false;
+    public $showDeleteModal = false;
     public $backupToRestore;
+    public $selectedBackup;
+    public $backupFile;
+    public $autoBackupEnabled = false;
     
     protected $backupService;
     
@@ -30,6 +34,9 @@ class BackupManager extends Component
     
     public function loadBackups()
     {
+        if (!$this->backupService) {
+            $this->backupService = new BackupService();
+        }
         $this->backups = $this->backupService->getBackupList();
     }
     
@@ -38,6 +45,10 @@ class BackupManager extends Component
         $this->isCreatingBackup = true;
         
         try {
+            if (!$this->backupService) {
+                $this->backupService = new BackupService();
+            }
+            
             $result = $this->backupService->createFullBackup();
             
             if ($result['success']) {
@@ -61,10 +72,24 @@ class BackupManager extends Component
         }
     }
     
-    public function downloadBackup($backupName)
+    public function refreshStorageInfo()
+    {
+        // This will trigger a re-render with fresh data
+        $this->loadBackups();
+    }
+    
+    public function refreshBackupList()
+    {
+        $this->loadBackups();
+    }
+    
+    public function downloadBackup($filename)
     {
         try {
-            return $this->backupService->downloadBackup($backupName);
+            if (!$this->backupService) {
+                $this->backupService = new BackupService();
+            }
+            return $this->backupService->downloadBackup($filename);
         } catch (\Exception $e) {
             $this->dispatch('backup-error', [
                 'message' => 'Erro ao baixar backup: ' . $e->getMessage()
@@ -72,49 +97,30 @@ class BackupManager extends Component
         }
     }
     
-    public function deleteBackup($backupName)
+    public function confirmRestore($filename)
     {
-        try {
-            $success = $this->backupService->deleteBackup($backupName);
-            
-            if ($success) {
-                $this->dispatch('backup-deleted', [
-                    'message' => 'Backup deletado com sucesso!'
-                ]);
-                
-                $this->loadBackups();
-            } else {
-                $this->dispatch('backup-error', [
-                    'message' => 'Erro ao deletar backup'
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('backup-error', [
-                'message' => 'Erro inesperado: ' . $e->getMessage()
-            ]);
-        }
-    }
-    
-    public function confirmRestore($backupName)
-    {
-        $this->backupToRestore = $backupName;
+        $this->selectedBackup = $filename;
         $this->showRestoreModal = true;
     }
     
     public function cancelRestore()
     {
         $this->showRestoreModal = false;
-        $this->backupToRestore = null;
+        $this->selectedBackup = null;
     }
     
     public function restoreBackup()
     {
-        if (!$this->backupToRestore) {
+        if (!$this->selectedBackup) {
             return;
         }
         
         try {
-            $result = $this->backupService->restoreBackup($this->backupToRestore);
+            if (!$this->backupService) {
+                $this->backupService = new BackupService();
+            }
+            
+            $result = $this->backupService->restoreBackup($this->selectedBackup);
             
             if ($result['success']) {
                 $this->dispatch('backup-restored', [
@@ -133,19 +139,108 @@ class BackupManager extends Component
             ]);
         } finally {
             $this->showRestoreModal = false;
-            $this->backupToRestore = null;
+            $this->selectedBackup = null;
         }
     }
     
+    public function confirmDelete($filename)
+    {
+        $this->selectedBackup = $filename;
+        $this->showDeleteModal = true;
+    }
+    
+    public function cancelDelete()
+    {
+        $this->showDeleteModal = false;
+        $this->selectedBackup = null;
+    }
+    
+    public function deleteBackup()
+    {
+        if (!$this->selectedBackup) {
+            return;
+        }
+        
+        try {
+            if (!$this->backupService) {
+                $this->backupService = new BackupService();
+            }
+            
+            $success = $this->backupService->deleteBackup($this->selectedBackup);
+            
+            if ($success) {
+                $this->dispatch('backup-deleted', [
+                    'message' => 'Backup deletado com sucesso!'
+                ]);
+                
+                $this->loadBackups();
+            } else {
+                $this->dispatch('backup-error', [
+                    'message' => 'Erro ao deletar backup'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('backup-error', [
+                'message' => 'Erro inesperado: ' . $e->getMessage()
+            ]);
+        } finally {
+            $this->showDeleteModal = false;
+            $this->selectedBackup = null;
+        }
+    }
+    
+    public function restoreFromFile()
+    {
+        if (!$this->backupFile) {
+            return;
+        }
+        
+        try {
+            if (!$this->backupService) {
+                $this->backupService = new BackupService();
+            }
+            
+            // Handle file upload and restore logic
+            $result = $this->backupService->restoreFromFile($this->backupFile);
+            
+            if ($result['success']) {
+                $this->dispatch('backup-restored', [
+                    'message' => 'Backup restaurado com sucesso!'
+                ]);
+                
+                $this->loadBackups();
+            } else {
+                $this->dispatch('backup-error', [
+                    'message' => 'Erro ao restaurar backup: ' . $result['error']
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('backup-error', [
+                'message' => 'Erro inesperado: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function getSystemInfoProperty()
     {
         return [
-            'database_size' => $this->getDatabaseSize(),
-            'files_size' => $this->getFilesSize(),
+            'database_size' => $this->formatBytes($this->getDatabaseSize()),
+            'files_size' => $this->formatBytes($this->getFilesSize()),
             'total_backups' => count($this->backups),
             'last_backup' => $this->backups[0] ?? null,
-            'disk_usage' => $this->getDiskUsage(),
+            'disk_usage' => $this->formatBytes($this->getDiskUsage()),
         ];
+    }
+    
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        
+        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+        
+        return round($bytes, $precision) . ' ' . $units[$i];
     }
     
     private function getDatabaseSize()
