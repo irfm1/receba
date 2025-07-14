@@ -3,29 +3,39 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
+    <body class="min-h-screen bg-white dark:bg-zinc-800 pwa-safe-area">
+        <!-- Status bar overlay for PWA -->
+        <div class="status-bar-overlay lg:hidden"></div>
+        
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+            <flux:sidebar.toggle class="lg:hidden sidebar-toggle" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse p-2 min-h-[48px] lg:min-h-auto" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Receba')" class="grid">
-                    <flux:navlist.item icon="chart-bar" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate>Clientes</flux:navlist.item>
-                    <flux:navlist.item icon="document-text" :href="route('invoices.index')" :current="request()->routeIs('invoices.*')" wire:navigate>Faturas</flux:navlist.item>
-                    <flux:navlist.item icon="clipboard-document-check" :href="route('technical-reports.index')" :current="request()->routeIs('technical-reports.*')" wire:navigate>Laudos Técnicos</flux:navlist.item>
+                    <flux:navlist.item icon="chart-bar" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="nav-item">{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate class="nav-item">Clientes</flux:navlist.item>
+                    <flux:navlist.item icon="document-text" :href="route('invoices.index')" :current="request()->routeIs('invoices.*')" wire:navigate class="nav-item">Faturas</flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-check" :href="route('technical-reports.index')" :current="request()->routeIs('technical-reports.*')" wire:navigate class="nav-item">Laudos Técnicos</flux:navlist.item>
                 </flux:navlist.group>
 
                 <flux:navlist.group heading="Catálogo de Serviços" class="grid">
-                    <flux:navlist.item icon="clipboard-document-list" :href="route('service-templates.index')" :current="request()->routeIs('service-templates.*')" wire:navigate>Templates de Serviços</flux:navlist.item>
-                    <flux:navlist.item icon="cube" :href="route('service-packages.index')" :current="request()->routeIs('service-packages.*')" wire:navigate>Pacotes de Serviços</flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-list" :href="route('service-templates.index')" :current="request()->routeIs('service-templates.*')" wire:navigate class="nav-item">Templates de Serviços</flux:navlist.item>
+                    <flux:navlist.item icon="cube" :href="route('service-packages.index')" :current="request()->routeIs('service-packages.*')" wire:navigate class="nav-item">Pacotes de Serviços</flux:navlist.item>
+                </flux:navlist.group>
+
+                <flux:navlist.group heading="Financeiro" class="grid">
+                    <flux:navlist.item icon="chart-pie" :href="route('financial-reports.index')" :current="request()->routeIs('financial-reports.*')" wire:navigate class="nav-item">Relatórios Financeiros</flux:navlist.item>
+                    <flux:navlist.item icon="calculator" :href="route('tax-simulator')" :current="request()->routeIs('tax-simulator')" wire:navigate class="nav-item">Simulador de Impostos</flux:navlist.item>
+                    <flux:navlist.item icon="archive-box" :href="route('backup-manager')" :current="request()->routeIs('backup-manager')" wire:navigate class="nav-item">Gestão de Backup</flux:navlist.item>
+                    <flux:navlist.item icon="document" :href="route('document-manager')" :current="request()->routeIs('document-manager')" wire:navigate class="nav-item">Gestão de Documentos</flux:navlist.item>
                 </flux:navlist.group>
                 
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="nav-item">{{ __('Home') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
@@ -88,15 +98,21 @@
         </flux:sidebar>
 
         <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+        <flux:header class="lg:hidden pwa-safe-area">
+            <flux:sidebar.toggle class="lg:hidden sidebar-toggle" icon="bars-2" inset="left" />
 
             <flux:spacer />
+
+            <!-- Online/Offline indicator -->
+            <div class="flex items-center mr-2">
+                <div id="network-status" class="w-3 h-3 rounded-full bg-green-500" title="Online"></div>
+            </div>
 
             <flux:dropdown position="top" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
+                    class="min-h-[44px]"
                 />
 
                 <flux:menu>

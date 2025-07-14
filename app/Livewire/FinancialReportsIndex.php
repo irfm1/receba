@@ -1,0 +1,206 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Customer;
+use App\Models\Invoice;
+use App\Models\TechnicalReport;
+use Carbon\Carbon;
+use Livewire\Component;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+
+#[Layout('components.layouts.app')]
+#[Title('Relatórios Financeiros')]
+class FinancialReportsIndex extends Component
+{
+    public $selectedPeriod = 'current_month';
+    public $startDate;
+    public $endDate;
+    public $selectedCustomer = null;
+    
+    public function mount()
+    {
+        $this->setDateRange();
+    }
+    
+    public function updatedSelectedPeriod()
+    {
+        $this->setDateRange();
+    }
+    
+    private function setDateRange()
+    {
+        switch ($this->selectedPeriod) {
+            case 'current_month':
+                $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+                break;
+            case 'last_month':
+                $this->startDate = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d');
+                $this->endDate = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d');
+                break;
+            case 'current_year':
+                $this->startDate = Carbon::now()->startOfYear()->format('Y-m-d');
+                $this->endDate = Carbon::now()->endOfYear()->format('Y-m-d');
+                break;
+            case 'last_year':
+                $this->startDate = Carbon::now()->subYear()->startOfYear()->format('Y-m-d');
+                $this->endDate = Carbon::now()->subYear()->endOfYear()->format('Y-m-d');
+                break;
+            case 'custom':
+                // Keep existing dates
+                break;
+        }
+    }
+    
+    public function getRevenueDataProperty()
+    {
+        $query = Invoice::whereBetween('issue_date', [$this->startDate, $this->endDate]);
+        
+        if ($this->selectedCustomer) {
+            $query->where('customer_id', $this->selectedCustomer);
+        }
+        
+        $invoices = $query->get();
+        
+        return [
+            'total_revenue' => $invoices->sum('total_amount'),
+            'paid_revenue' => $invoices->where('payment_status', 'paid')->sum('total_amount'),
+            'pending_revenue' => $invoices->where('payment_status', 'pending')->sum('total_amount'),
+            'overdue_revenue' => $invoices->where('payment_status', 'overdue')->sum('total_amount'),
+            'total_invoices' => $invoices->count(),
+            'paid_invoices' => $invoices->where('payment_status', 'paid')->count(),
+            'pending_invoices' => $invoices->where('payment_status', 'pending')->count(),
+            'overdue_invoices' => $invoices->where('payment_status', 'overdue')->count(),
+        ];
+    }
+    
+    public function getMonthlyRevenueProperty()
+    {
+        $query = Invoice::whereBetween('issue_date', [$this->startDate, $this->endDate]);
+        
+        if ($this->selectedCustomer) {
+            $query->where('customer_id', $this->selectedCustomer);
+        }
+        
+        return $query->selectRaw('strftime("%Y-%m", issue_date) as month, SUM(total_amount) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    }
+    
+    public function getTopCustomersProperty()
+    {
+        $query = Invoice::whereBetween('issue_date', [$this->startDate, $this->endDate]);
+        
+        return $query->selectRaw('customer_id, SUM(total_amount) as total_revenue, COUNT(*) as invoice_count')
+            ->groupBy('customer_id')
+            ->orderBy('total_revenue', 'desc')
+            ->limit(10)
+            ->with('customer')
+            ->get();
+    }
+    
+    public function getServiceRevenueProperty()
+    {
+        $query = Invoice::whereBetween('issue_date', [$this->startDate, $this->endDate]);
+        
+        if ($this->selectedCustomer) {
+            $query->where('customer_id', $this->selectedCustomer);
+        }
+        
+        return $query->selectRaw('service_type, SUM(total_amount) as total_revenue, COUNT(*) as invoice_count')
+            ->whereNotNull('service_type')
+            ->groupBy('service_type')
+            ->orderBy('total_revenue', 'desc')
+            ->get();
+    }
+    
+    public function getTechnicalReportsDataProperty()
+    {
+        $query = TechnicalReport::whereBetween('report_date', [$this->startDate, $this->endDate]);
+        
+        if ($this->selectedCustomer) {
+            $query->where('customer_id', $this->selectedCustomer);
+        }
+        
+        $reports = $query->get();
+        
+        return [
+            'total_reports' => $reports->count(),
+            'completed_reports' => $reports->where('status', 'completed')->count(),
+            'approved_reports' => $reports->where('status', 'approved')->count(),
+            'draft_reports' => $reports->where('status', 'draft')->count(),
+            'by_type' => $reports->groupBy('report_type')->map(function ($group) {
+                return $group->count();
+            }),
+        ];
+    }
+    
+    public function exportToCsv()
+    {
+        $filename = 'relatorio_financeiro_' . $this->startDate . '_' . $this->endDate . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+        
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            
+            // CSV headers
+            fputcsv($file, [
+                'Data',
+                'Cliente',
+                'Fatura',
+                'Valor',
+                'Status',
+                'Tipo de Serviço',
+                'Vencimento'
+            ]);
+            
+            // Data
+            $query = Invoice::whereBetween('issue_date', [$this->startDate, $this->endDate]);
+            if ($this->selectedCustomer) {
+                $query->where('customer_id', $this->selectedCustomer);
+            }
+            
+            $invoices = $query->with('customer')->get();
+            
+            foreach ($invoices as $invoice) {
+                fputcsv($file, [
+                    $invoice->issue_date->format('d/m/Y'),
+                    $invoice->customer->name,
+                    $invoice->invoice_number,
+                    'R$ ' . number_format($invoice->total_amount, 2, ',', '.'),
+                    match($invoice->payment_status) {
+                        'paid' => 'Pago',
+                        'pending' => 'Pendente',
+                        'overdue' => 'Vencido',
+                        default => 'Indefinido'
+                    },
+                    $invoice->service_type ?? 'N/A',
+                    $invoice->due_date ? $invoice->due_date->format('d/m/Y') : 'N/A'
+                ]);
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+    
+    public function render()
+    {
+        return view('livewire.financial-reports-index', [
+            'customers' => Customer::orderBy('name')->get(),
+            'revenueData' => $this->revenueData,
+            'monthlyRevenue' => $this->monthlyRevenue,
+            'topCustomers' => $this->topCustomers,
+            'serviceRevenue' => $this->serviceRevenue,
+            'technicalReportsData' => $this->technicalReportsData,
+        ]);
+    }
+}

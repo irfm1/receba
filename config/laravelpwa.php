@@ -1,16 +1,20 @@
 <?php
 
 return [
-    'name' => 'Receba',
+    'name' => 'Receba - Gestão de Faturas TI',
     'manifest' => [
-        'name' => env('APP_NAME', 'My PWA App'),
-        'short_name' => 'RCB',
-        'start_url' => '/app/home',
+        'name' => 'Receba - Sistema de Gestão de Faturas para TI',
+        'short_name' => 'Receba',
+        'start_url' => '/dashboard',
         'background_color' => '#ffffff',
-        'theme_color' => '#000000',
+        'theme_color' => '#4f46e5',
         'display' => 'standalone',
-        'orientation'=> 'any',
-        'status_bar'=> 'black',
+        'orientation'=> 'portrait-primary',
+        'status_bar'=> 'default',
+        'categories' => ['business', 'productivity', 'finance'],
+        'description' => 'Sistema completo de gestão de faturas para prestadores de serviços de TI',
+        'lang' => 'pt-BR',
+        'scope' => '/',
         'icons' => [
             '72x72' => [
                 'path' => '/images/icons/icon-72x72.png',

@@ -85,6 +85,14 @@ Route::middleware(['auth'])->group(function () {
     })->name('technical-reports.send-email');
 });
 
+// Financial Reports routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('financial-reports', App\Livewire\FinancialReportsIndex::class)->name('financial-reports.index');
+    Route::get('tax-simulator', App\Livewire\TaxSimulator::class)->name('tax-simulator');
+    Route::get('backup-manager', App\Livewire\BackupManager::class)->name('backup-manager');
+    Route::get('document-manager', App\Livewire\DocumentManager::class)->name('document-manager');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

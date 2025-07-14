@@ -178,19 +178,24 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 
 ## Roadmap de Desenvolvimento
 
-### Fase 1 - MVP Local
+### Fase 1 - MVP Local ✅ CONCLUÍDA
 - [x] Gestão básica de clientes
 - [x] Geração simples de faturas
 - [x] **Catálogo de Serviços de TI** ✨
 - [x] **Laudos Técnicos** ✨
-- [ ] Armazenamento local (SQLite)
-- [ ] Interface mobile-first
+- [x] Armazenamento local (SQLite)
+- [x] Interface mobile-first
+- [x] Service Workers otimizados
+- [x] Funcionalidade offline completa
+- [x] Progressive Web App (PWA)
 
-### Fase 2 - Recursos Financeiros
-- [ ] Relatórios financeiros
-- [ ] Cálculos de impostos brasileiros
-- [ ] Gestão de documentos
-- [ ] Sistema de backup local
+### Fase 2 - Recursos Financeiros ✅ CONCLUÍDA
+- [x] Relatórios financeiros
+- [x] Cálculos de impostos brasileiros (ISS, Simples Nacional, INSS, IRRF)
+- [x] Simulador de impostos
+- [x] Gestão de documentos (upload, download, organização)
+- [x] Sistema de backup local completo
+- [x] Gestão de backup/restore automático
 
 ### Fase 3 - Sincronização
 - [ ] Engine de sincronização P2P
