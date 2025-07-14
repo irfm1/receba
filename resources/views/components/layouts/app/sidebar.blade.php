@@ -16,6 +16,7 @@
                     <flux:navlist.item icon="chart-bar" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate>Clientes</flux:navlist.item>
                     <flux:navlist.item icon="document-text" :href="route('invoices.index')" :current="request()->routeIs('invoices.*')" wire:navigate>Faturas</flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-check" :href="route('technical-reports.index')" :current="request()->routeIs('technical-reports.*')" wire:navigate>Laudos Técnicos</flux:navlist.item>
                 </flux:navlist.group>
 
                 <flux:navlist.group heading="Catálogo de Serviços" class="grid">

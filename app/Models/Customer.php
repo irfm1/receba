@@ -130,6 +130,11 @@ class Customer extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function technicalReports(): HasMany
+    {
+        return $this->hasMany(TechnicalReport::class);
+    }
+
     private function formatCpf(string $cpf): string
     {
         $cpf = preg_replace('/\D/', '', $cpf);

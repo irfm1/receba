@@ -62,6 +62,29 @@ Route::middleware(['auth'])->group(function () {
     })->name('service-packages.edit');
 });
 
+// Technical Reports routes
+Route::middleware(['auth'])->group(function () {
+    Route::view('technical-reports', 'technical-reports.index')->name('technical-reports.index');
+    Route::view('technical-reports/create', 'technical-reports.create')->name('technical-reports.create');
+    Route::get('technical-reports/{technicalReport}', function (App\Models\TechnicalReport $technicalReport) {
+        return view('technical-reports.show', compact('technicalReport'));
+    })->name('technical-reports.show');
+    Route::get('technical-reports/{technicalReport}/edit', function (App\Models\TechnicalReport $technicalReport) {
+        return view('technical-reports.edit', compact('technicalReport'));
+    })->name('technical-reports.edit');
+    Route::get('technical-reports/{technicalReport}/pdf', function (App\Models\TechnicalReport $technicalReport) {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('technical-reports.pdf', ['report' => $technicalReport]);
+        $filename = 'laudo-tecnico-' . $technicalReport->report_number . '.pdf';
+        return $pdf->download($filename);
+    })->name('technical-reports.pdf');
+    Route::post('technical-reports/{technicalReport}/send-email', function (App\Models\TechnicalReport $technicalReport) {
+        \Illuminate\Support\Facades\Mail::to($technicalReport->customer->email)
+            ->send(new \App\Mail\TechnicalReportMail($technicalReport));
+        
+        return response()->json(['message' => 'Laudo enviado por email com sucesso!']);
+    })->name('technical-reports.send-email');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

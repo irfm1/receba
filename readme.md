@@ -50,14 +50,26 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 - **Pacotes de Projetos**: Serviços agrupados com preços fixos
 - **Serviços Recorrentes**: Manutenção mensal, hospedagem e licenças
 
-### 4. Gestão Financeira
+### 4. Laudos Técnicos
+- **Laudos Profissionais**: Criação de laudos técnicos detalhados com identidade visual
+- **Múltiplos Tipos**: Suporte a diagnóstico, instalação, manutenção, segurança e performance
+- **Gestão de Equipamentos**: Controle de equipamentos/sistemas analisados
+- **Anexos e Evidências**: Upload de fotos, documentos e relatórios complementares
+- **Integração com Faturas**: Vinculação de laudos às faturas e ordens de serviço
+- **Geração de PDF**: Laudos profissionais em PDF com formatação adequada
+- **Envio por Email**: Envio automático de laudos por email para clientes
+- **Templates Reutilizáveis**: Criação de templates de laudos para padronização
+- **Controle de Aprovação**: Fluxo de aprovação e validação de laudos
+- **Histórico Completo**: Rastreamento de alterações e versionamento
+
+### 5. Gestão Financeira
 - **Acompanhamento de Pagamentos**: Gestão completa de status (pago, parcial, em atraso)
 - **Métodos de Pagamento**: Suporte para transferência bancária, PIX, cartões
 - **Análise de Receita**: Análise mensal e anual de receitas
 - **Relatórios de Inadimplência**: Acompanhamento de faturas em aberto
 - **Gestão de Despesas**: Controle de despesas empresariais para análise de rentabilidade
 
-### 5. Gestão de Documentos
+### 6. Gestão de Documentos
 - **Geração de PDFs**: Faturas em PDF profissionais
 - **Integração com Email**: Envio direto de faturas por email
 - **Armazenamento de Documentos**: Contratos, propostas e documentos relacionados
@@ -65,19 +77,19 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 
 ## Requisitos Técnicos
 
-### 6. Autenticação e Segurança
+### 7. Autenticação e Segurança
 - **Suporte a Múltiplos Usuários**: Acesso baseado em funções (admin, contador, visualizador)
 - **Permissões Granulares**: Controle de acesso seguro aos dados financeiros
 - **Autenticação de Dois Fatores**: Medidas de segurança aprimoradas
 - **Registro de Atividades**: Trilhas de auditoria completas
 
-### 7. Gestão de Dados
+### 8. Gestão de Dados
 - **Backups Automatizados**: Proteção de dados críticos
 - **Exportação/Importação de Dados**: Compatibilidade com CSV e Excel
 - **Conformidade com a LGPD**: Lei brasileira de proteção de dados
 - **Migração de Dados**: Importação de sistemas existentes
 
-### 8. Capacidades de Integração
+### 9. Capacidades de Integração
 - **Integração Bancária**: Conectividade com bancos brasileiros para verificação de pagamentos
 - **Software de Contabilidade**: Capacidades de exportação para sistemas contábeis populares
 - **Integração com WhatsApp**: Notificações de faturas via WhatsApp
@@ -85,38 +97,38 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 
 ## Recursos Avançados
 
-### 9. Inteligência de Negócios
+### 10. Inteligência de Negócios
 - **Dashboard de Receita**: Visão geral visual do desempenho dos negócios
 - **Análise de Clientes**: Análise de rentabilidade e comportamento de pagamento
 - **Desempenho de Serviços**: Geração de receita por tipo de serviço
 - **Projeções de Fluxo de Caixa**: Previsões com base em faturas pendentes
 - **Relatórios de Impostos**: Relatórios automatizados de conformidade fiscal
 
-### 10. Automação de Workflow
+### 11. Automação de Workflow
 - **Lembretes Inteligentes**: Notificações automáticas de faturas vencidas
 - **Cobrança Recorrente**: Geração automática de faturas para serviços recorrentes
 - **Alertas de Pagamento**: Notificações de pagamento em tempo real
 - **Tarefas de Acompanhamento**: Gestão automatizada de relacionamento com o cliente
 
-### 11. Aplicativo Móvel e Web Progressivo
+### 12. Aplicativo Móvel e Web Progressivo
 - **Capacidade Offline**: Acesso a faturas e dados de clientes sem internet
 - **Design Responsivo**: Otimizado para tablets e smartphones
 - **Notificações Push**: Lembretes de pagamento e alertas do sistema
 - **Ações Rápidas**: Criação rápida de faturas a partir de dispositivos móveis
 
-### 12. Gestão de Projetos
+### 13. Gestão de Projetos
 - **Rastreamento de Projetos**: Vincular faturas a projetos específicos
 - **Rastreamento de Tempo**: Controle de horas gastas por projeto
 - **Cobrança por Marcos**: Faturamento baseado em marcos de projeto
 - **Colaboração em Equipe**: Gestão de projetos com múltiplos usuários
 
-### 13. Portal do Cliente
+### 14. Portal do Cliente
 - **Dashboard do Cliente**: Acesso do cliente a faturas e histórico de pagamentos
 - **Pagamentos Online**: Integração com gateways de pagamento brasileiros (PagSeguro, MercadoPago)
 - **Aprovação de Faturas**: Fluxo de trabalho de aprovação de faturas pelo cliente
 - **Troca Segura de Documentos**: Compartilhamento protegido de documentos
 
-### 14. API e Integrações de Terceiros
+### 15. API e Integrações de Terceiros
 - **API REST**: Integração com sistemas de terceiros
 - **Suporte a Webhooks**: Notificações externas em tempo real
 - **Integração com CRM**: Conectividade com sistemas CRM populares
@@ -124,7 +136,7 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 
 ## Conformidade com o Mercado Brasileiro
 
-### 15. Requisitos Legais e Regulatórios
+### 16. Requisitos Legais e Regulatórios
 - **Integração NFSe**: Conformidade com faturas de serviços municipais
 - **Validação de CPF/CNPJ**: Validação e verificação de CPF/CNPJ
 - **Padrões de Endereço**: Formatação de CEP e endereço brasileiros
@@ -170,6 +182,7 @@ O Receba é um sistema **open source** projetado para simplificar a gestão de f
 - [x] Gestão básica de clientes
 - [x] Geração simples de faturas
 - [x] **Catálogo de Serviços de TI** ✨
+- [x] **Laudos Técnicos** ✨
 - [ ] Armazenamento local (SQLite)
 - [ ] Interface mobile-first
 
